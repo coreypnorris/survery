@@ -44,6 +44,7 @@ def design_menu
     puts "Press 'Q' to create and add a question to a survey"
     # add choices to existing questions
     puts "Press 'VQ' to view all the questions in a particular survey"
+    puts "Press 'A' to view analytics for a survey"
     puts "Press 'M' to return to the main menu"
 
     choice = gets.chomp.upcase
@@ -56,6 +57,8 @@ def design_menu
       create_question
     when 'VQ'
       view_questions
+    when 'A'
+      view_analytics
     when 'M'
       puts "Returning to main menu..."
     else
@@ -155,6 +158,21 @@ def show_completed_survey(survey, taker)
     answer_obj = Answer.where(question_id: question.id, taker_id: taker.id).first
     answer_chosen = Choice.find_by id: answer_obj.choice_id
     puts "Answer: #{answer_chosen.description}"
+  end
+end
+
+def view_analytics
+  view_surveys
+  puts "View analytics for which survey?"
+  index = gets.chomp.to_i
+  survey = Survey.all[index - 1]
+  survey.questions.each do |question|
+    puts "\n #{question.description}"
+    question.choices.each_with_index do |choice, index|
+      puts "#{index + 1}. #{choice.description}"
+      puts "Chosen by #{choice.answers.length} people"
+      puts "Chosen by #{question.percentage(choice)}% of respondents"
+    end
   end
 end
 
