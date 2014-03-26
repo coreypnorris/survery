@@ -88,7 +88,12 @@ def create_question
   survey = Survey.all[survey_index-1]
   puts "Enter the question:"
   description = gets.chomp
-  new_question = Question.create({description: description, survey_id: survey.id})
+  puts "What type of question is it?"
+  puts "1. Multiple Choice"
+  puts "2. Multiple Answer"
+  puts "3. Open-Ended"
+  question_type = gets.chomp
+  new_question = Question.create({description: description, question_type: question_type, survey_id: survey.id})
   puts "Would you like to add answer choices to your question? (Y/N)"
   case gets.chomp.upcase
   when 'Y', 'YES'
@@ -142,22 +147,53 @@ end
 def take_survey(survey, taker)
   survey.questions.each do |question|
     puts "\n #{question.description}"
-    question.choices.each do |choice|
-      puts "- #{choice.description}"
+    if question.question_type == '1'
+      multiple_choice_q(question, taker)
+    elsif question.question_type == '2'
+      multiple_answer_q(question, taker)
+    elsif question.question_type == '3'
+      open_ended_q(question, taker)
     end
-    puts "Enter your answer:"
-    choice = Choice.find_by description: gets.chomp
-    answer = Answer.create({question_id: question.id, choice_id: choice.id, taker_id: taker.id})
   end
   show_completed_survey(survey, taker)
 end
 
+def multiple_choice_q(question, taker)
+  question.choices.each do |choice|
+    puts "- #{choice.description}"
+  end
+  puts "Enter your answer:"
+  choice = Choice.find_by description: gets.chomp
+  answer = Answer.create({question_id: question.id, choice_id: choice.id, taker_id: taker.id})
+end
+
+def multiple_answer_q(question, taker)
+  question.choices.each do |choice|
+    puts "- #{choice.description}"
+  end
+  selection = nil
+  until selection == 'N' || selection == 'NO'
+    puts "Enter an answer:"
+    choice = Choice.find_by description: gets.chomp
+    answer = Answer.create({question_id: question.id, choice_id: choice.id, taker_id: taker.id})
+    puts "Add another answer? (Y/N)"
+    selection = gets.chomp.upcase
+  end
+end
+
+def open_ended_q(question, taker)
+
+end
+
+
 def show_completed_survey(survey, taker)
   survey.questions.each do |question|
     puts "\n #{question.description}"
-    answer_obj = Answer.where(question_id: question.id, taker_id: taker.id).first
-    answer_chosen = Choice.find_by id: answer_obj.choice_id
-    puts "Answer: #{answer_chosen.description}"
+    answers = Answer.where(question_id: question.id, taker_id: taker.id)
+    answers.each do |answer|
+      answer_chosen = Choice.find_by id: answer.choice_id
+      puts "Answer: #{answer_chosen.description}"
+    end
   end
 end
 
