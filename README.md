@@ -20,4 +20,4 @@
 
 ###### DONE - As a survey designer, I want to have open-ended questions, so that I can ask questions like "Please explain why you chose to become a programmer."
 
-###### As a survey designer, I want to let respondents choose "Other" for some questions, so that they can input their own choice if my choices aren't sufficient.
+###### DONE - As a survey designer, I want to let respondents choose "Other" for some questions, so that they can input their own choice if my choices aren't sufficient.

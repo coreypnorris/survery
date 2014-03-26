@@ -94,13 +94,18 @@ def create_question
   puts "3. Open-Ended"
   question_type = gets.chomp
   new_question = Question.create({description: description, question_type: question_type, survey_id: survey.id})
+  if question_type == '3'
+    puts "The question has been added to #{survey.name}"
+  elsif question_type == '1' || question_type == '2'
+    puts "Would you like to add answer choices to your question? (Y/N)"
+    case gets.chomp.upcase
+    when 'Y', 'YES'
+      add_choices(new_question)
+    end
+    puts "The question has been added to #{survey.name}"
   else
-  puts "Would you like to add answer choices to your question? (Y/N)"
-  case gets.chomp.upcase
-  when 'Y', 'YES'
-    add_choices(new_question)
+    puts "Invalid selection"
   end
-  puts "The question has been added to #{survey.name}"
 end
 
 def view_questions
@@ -163,9 +168,7 @@ def multiple_choice_q(question, taker)
   question.choices.each do |choice|
     puts "- #{choice.description}"
   end
-  puts "Enter your answer:"
-  choice = Choice.find_by description: gets.chomp
-  answer = Answer.create({question_id: question.id, choice_id: choice.id, taker_id: taker.id})
+  make_choice(question, taker)
 end
 
 def multiple_answer_q(question, taker)
@@ -174,12 +177,22 @@ def multiple_answer_q(question, taker)
   end
   selection = nil
   until selection == 'N' || selection == 'NO'
-    puts "Enter an answer:"
-    choice = Choice.find_by description: gets.chomp
-    answer = Answer.create({question_id: question.id, choice_id: choice.id, taker_id: taker.id})
+    make_choice(question, taker)
     puts "Add another answer? (Y/N)"
     selection = gets.chomp.upcase
   end
+end
+
+def make_choice(question, taker)
+  puts "Enter an answer:"
+  choice = gets.chomp
+  if choice.upcase == 'OTHER'
+    puts "Enter your own choice"
+    choice_obj = Choice.create({description: gets.chomp, question_id: question.id})
+  else
+    choice_obj = Choice.find_by description: choice
+  end
+  answer = Answer.create({question_id: question.id, choice_id: choice_obj.id, taker_id: taker.id})
 end
 
 def open_ended_q(question, taker)
