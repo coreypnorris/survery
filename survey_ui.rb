@@ -42,6 +42,7 @@ def design_menu
     puts "Press 'S' to create a new survey"
     puts "Press 'VS' to view all surveys"
     puts "Press 'Q' to create and add a question to a survey"
+    # add choices to existing questions
     puts "Press 'VQ' to view all the questions in a particular survey"
     puts "Press 'M' to return to the main menu"
 
@@ -71,6 +72,7 @@ def create_survey
 end
 
 def view_surveys
+  puts "Available surveys:"
   Survey.all.each_with_index do |survey, index|
     puts "#{index + 1}. #{survey.name}"
   end
@@ -99,8 +101,8 @@ def view_questions
   survey = Survey.all[survey_index-1]
   Question.where(survey_id: survey.id).each do |question|
     puts "\n #{question.description}"
-    question.choices.each do |choice|
-      puts "- #{choice.description}"
+    question.choices.each_with_index do |choice, index|
+      puts "#{index + 1}. #{choice.description}"
     end
   end
 end
@@ -114,6 +116,45 @@ def add_choices(question)
     puts "Choice: '#{choice.description}' added to Question: '#{question.description}'"
     puts "Add another answer choice? (Y/N)"
     selection = gets.chomp.upcase
+  end
+end
+
+def taker_menu
+  puts "What is your name?"
+  name = gets.chomp
+  taker = Taker.create({name: name})
+  puts "Welcome, #{taker.name}!"
+  selection = nil
+  until selection == 'N' || selection == 'NO'
+    view_surveys
+    puts "Which survey would you like to take?"
+    index = gets.chomp.to_i
+    survey = Survey.all[index - 1]
+    take_survey(survey, taker)
+    puts "Take another survey? (Y/N)"
+    selection = gets.chomp.upcase
+  end
+end
+
+def take_survey(survey, taker)
+  survey.questions.each do |question|
+    puts "\n #{question.description}"
+    question.choices.each do |choice|
+      puts "- #{choice.description}"
+    end
+    puts "Enter your answer:"
+    choice = Choice.find_by description: gets.chomp
+    answer = Answer.create({question_id: question.id, choice_id: choice.id, taker_id: taker.id})
+  end
+  show_completed_survey(survey, taker)
+end
+
+def show_completed_survey(survey, taker)
+  survey.questions.each do |question|
+    puts "\n #{question.description}"
+    answer_obj = Answer.where(question_id: question.id, taker_id: taker.id).first
+    answer_chosen = Choice.find_by id: answer_obj.choice_id
+    puts "Answer: #{answer_chosen.description}"
   end
 end
 
