@@ -84,6 +84,11 @@ def create_question
   puts "Enter the question:"
   description = gets.chomp
   new_question = Question.create({description: description, survey_id: survey.id})
+  puts "Would you like to add answer choices to your question? (Y/N)"
+  case gets.chomp.upcase
+  when 'Y', 'YES'
+    add_choices(new_question)
+  end
   puts "The question has been added to #{survey.name}"
 end
 
@@ -92,9 +97,25 @@ def view_questions
   view_surveys
   survey_index = gets.chomp.to_i
   survey = Survey.all[survey_index-1]
-  Question.where(survey_id: survey.id).each { |i| puts i.description }
+  Question.where(survey_id: survey.id).each do |question|
+    puts "\n #{question.description}"
+    question.choices.each do |choice|
+      puts "- #{choice.description}"
+    end
+  end
 end
 
+def add_choices(question)
+  selection = nil
+  until selection == 'N' || selection == 'NO'
+    puts "Enter an answer choice:"
+    description = gets.chomp
+    choice = Choice.create({description: description, question_id: question.id})
+    puts "Choice: '#{choice.description}' added to Question: '#{question.description}'"
+    puts "Add another answer choice? (Y/N)"
+    selection = gets.chomp.upcase
+  end
+end
 
 welcome
 
