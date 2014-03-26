@@ -94,6 +94,7 @@ def create_question
   puts "3. Open-Ended"
   question_type = gets.chomp
   new_question = Question.create({description: description, question_type: question_type, survey_id: survey.id})
+  else
   puts "Would you like to add answer choices to your question? (Y/N)"
   case gets.chomp.upcase
   when 'Y', 'YES'
@@ -182,7 +183,10 @@ def multiple_answer_q(question, taker)
 end
 
 def open_ended_q(question, taker)
-
+  puts "Enter your answer here:"
+  answer = gets.chomp
+  choice = Choice.create({description: answer, question_id: question.id})
+  Answer.create({question_id: question.id, choice_id: choice.id, taker_id: taker.id})
 end
 
 
@@ -206,8 +210,7 @@ def view_analytics
     puts "\n #{question.description}"
     question.choices.each_with_index do |choice, index|
       puts "#{index + 1}. #{choice.description}"
-      puts "Chosen by #{choice.answers.length} people"
-      puts "Chosen by #{question.percentage(choice)}% of respondents"
+      puts "Chosen by #{choice.answers.length} people (#{question.percentage(choice)}% of responses)"
     end
   end
 end
