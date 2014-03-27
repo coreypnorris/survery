@@ -5,6 +5,9 @@ describe Question do
   it { should have_many :choices }
   it { should have_many :answers }
   it { should have_many :takers }
+  it { should validate_presence_of :description }
+  it { should ensure_length_of(:description).is_at_most(50) }
+  it { should ensure_length_of(:description).is_at_least(2) }
 
   describe '#percentage' do
     it 'should return the percentage of respondents who chose a specific answer' do

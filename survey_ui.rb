@@ -11,7 +11,30 @@ development_configuration = database_configurations["development"]
 ActiveRecord::Base.establish_connection(development_configuration)
 
 def welcome
+  system "clear"
   puts "Welcome to the survey program!"
+  puts "
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWP'dP'dWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWW'VWWWb &'''.o.. .dWWWWWWWWWWWWP~~''_{WWWWWWWWWWWWWWWWWWWWWW
+WWWWWWb  '''''''w.     jWWWWWWWP'  ,.--''    .wWWWWWWWWWWWWWWWWWW
+WWWWWWWbWWWWF''''''    WWWWWWP' .-'          {WWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWLLWP      jWWWWP'               .wwWWWWWWWWW WWWWWWWW
+WWWWW'W'W'WWWW'      jWWW'                 {WWWWWWWWWWP  'VWWWWWW
+WWWWWW, dWWWW'      jWWWW                 .wwWWP'.w.'WWP.WWWWWWWW
+WWWWWW' VWWWW        VWW'               _{WWWW( WWWW. P.WWWWWWWWW
+::::::':  :::         '                {  ':::::. '' ,.::::::::::
+:::::,:::  ::                                '''''  .::::::::::::
+::::::::::                                       ..,:::::::::::::
+:::::::::::   .                  ..:.      ':::::::::::::::::::::
+:::::::::::: ::   .: ::::::::   :::::::.          '::::::::::::::
+::::::::::::::' .::::::::::::.    .::::::::::::::  ::::::::::::::
+:::::::::::::'.:::::::::::::::::  ::::::::::::::'  ::::::::::::::
+:::::::'.....:.. ::::::::'......:. :::::::::'....::.'::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+  "
   main_menu
 end
 
@@ -27,7 +50,7 @@ def main_menu
     when 'D'
       design_menu
     when 'T'
-      taker_menu
+      create_taker
     when 'X'
       puts "Thanks for using SurveyMakerPro 60000"
     else
@@ -42,7 +65,6 @@ def design_menu
     puts "Press 'S' to create a new survey"
     puts "Press 'VS' to view all surveys"
     puts "Press 'Q' to create and add a question to a survey"
-    # add choices to existing questions
     puts "Press 'VQ' to view all the questions in a particular survey"
     puts "Press 'A' to view analytics for a survey"
     puts "Press 'M' to return to the main menu"
@@ -70,8 +92,13 @@ end
 def create_survey
   puts "Name your survey:"
   name = gets.chomp
-  survey = Survey.create({name: name})
-  puts "#{survey.name} ADDED!"
+  survey = Survey.new({name: name})
+  if survey.save
+    puts "#{survey.name} ADDED!"
+  else
+    puts "Invalid survey:"
+    survey.errors.full_messages.each { |message| puts message }
+  end
 end
 
 def view_surveys
@@ -133,11 +160,21 @@ def add_choices(question)
   end
 end
 
-def taker_menu
+def create_taker
   puts "What is your name?"
   name = gets.chomp
-  taker = Taker.create({name: name})
-  puts "Welcome, #{taker.name}!"
+  taker = Taker.new({name: name})
+  if taker.save
+    puts "#{taker.name} ADDED!"
+    puts "Welcome, #{taker.name}!"
+    taker_menu
+  else
+    puts "Invalid taker:"
+    taker.errors.full_messages.each { |message| puts message }
+  end
+end
+
+def taker_menu
   selection = nil
   until selection == 'N' || selection == 'NO'
     view_surveys
@@ -229,15 +266,4 @@ def view_analytics
 end
 
 welcome
-
-
-
-
-
-
-
-
-
-
-
 

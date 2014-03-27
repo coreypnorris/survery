@@ -1,6 +1,6 @@
 #Survey
 
-## Make an app that lets people design and take surveys. Here are some user stories:
+### Make an app that lets people design and take surveys. Here are some user stories:
 
 ###### DONE - As a survey designer, I want to create a new survey, so that I can get people's opinion on important matters.
 

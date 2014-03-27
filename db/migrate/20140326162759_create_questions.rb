@@ -3,6 +3,7 @@ class CreateQuestions < ActiveRecord::Migration
     create_table :questions do |t|
       t.column :description, :string
       t.column :survey_id, :int
+      t.column :question_type, :string
 
       t.timestamps
     end
